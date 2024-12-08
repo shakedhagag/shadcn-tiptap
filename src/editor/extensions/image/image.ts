@@ -91,7 +91,7 @@ const fetchImageBlob = async (src: string): Promise<{ blob: Blob; extension: str
   return src.startsWith('data:') ? handleDataUrl(src) : handleImageUrl(src)
 }
 
-const saveImage = async (blob: Blob, name: string, extension: string): Promise<void> => {
+const saveImage = (blob: Blob, name: string,extension: string): void => {
   const imageURL = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = imageURL
@@ -108,7 +108,7 @@ const downloadImage = async (props: ImageActionProps, options: CustomImageOption
 
   try {
     const { blob, extension } = await fetchImageBlob(src)
-    await saveImage(blob, potentialName, extension)
+    saveImage(blob, potentialName, extension)
     options.onActionSuccess?.({ ...props, action: 'download' })
   } catch (error) {
     handleError(error, { ...props, action: 'download' }, options.onActionError)
@@ -142,7 +142,8 @@ export const Image = TiptapImage.extend<CustomImageOptions>({
 
   addOptions() {
     return {
-      ...this.parent?.(),
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      ...this.parent?.(), 
       allowedMimeTypes: [],
       maxFileSize: 0,
       uploadFn: undefined,
@@ -293,8 +294,9 @@ export const Image = TiptapImage.extend<CustomImageOptions>({
           if (node.type.name === 'image') {
             const attrs = node.attrs
 
-            if (attrs.src.startsWith('blob:')) {
-              URL.revokeObjectURL(attrs.src)
+            const src = attrs.src as string
+            if (src.startsWith('blob:')) {
+              URL.revokeObjectURL(src)
             }
 
             this.options.onImageRemoved?.(attrs)

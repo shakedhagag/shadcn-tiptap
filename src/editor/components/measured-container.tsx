@@ -9,7 +9,13 @@ interface MeasuredContainerProps<T extends React.ElementType> {
 
 export const MeasuredContainer = React.forwardRef(
   <T extends React.ElementType>(
-    { as: Component, name, children, style = {}, ...props }: MeasuredContainerProps<T> & React.ComponentProps<T>,
+    {
+      as: Component,
+      name,
+      children,
+      style = {},
+      ...props
+    }: MeasuredContainerProps<T> & React.ComponentProps<T>,
     ref: React.Ref<HTMLElement>
   ) => {
     const innerRef = React.useRef<HTMLElement>(null)
@@ -18,12 +24,16 @@ export const MeasuredContainer = React.forwardRef(
     React.useImperativeHandle(ref, () => innerRef.current as HTMLElement)
 
     const customStyle = {
-      [`--${name}-width`]: `${rect.width}px`,
-      [`--${name}-height`]: `${rect.height}px`
+      [`--${String(name)}-width`]: `${String(rect.width)}px`,
+      [`--${String(name)}-height`]: `${String(rect.height)}px`
     }
 
     return (
-      <Component {...props} ref={innerRef} style={{ ...customStyle, ...style }}>
+      <Component
+        {...props}
+        ref={innerRef}
+        style={{ ...customStyle, ...style } as React.CSSProperties}
+      >
         {children}
       </Component>
     )

@@ -59,6 +59,7 @@
     "sonner": "^1.7.0",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
+    "tiptap-extension-global-drag-handle": "^0.1.16",
     "typescript-eslint": "^8.17.0"
   },
   "devDependencies": {

@@ -4,6 +4,7 @@ import { common, createLowlight } from 'lowlight'
 export const CodeBlockLowlight = TiptapCodeBlockLowlight.extend({
   addOptions() {
     return {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       ...this.parent?.(),
       lowlight: createLowlight(common),
       defaultLanguage: null,

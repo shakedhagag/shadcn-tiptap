@@ -16,7 +16,8 @@ import {
   Color,
   UnsetAllMarks,
   ResetMarksOnEnter,
-  FileHandler
+  FileHandler,
+  GlobalDragHandleExtension
 } from '../extensions'
 import { cn } from '@/lib/utils'
 import { fileToBase64, getOutput, randomId } from '../utils'
@@ -45,6 +46,7 @@ const createExtensions = (placeholder: string) => [
     code: { HTMLAttributes: { class: 'inline', spellcheck: 'false' } },
     dropcursor: { width: 2, class: 'ProseMirror-dropcursor border' }
   }),
+  GlobalDragHandleExtension,
   Link,
   Underline,
   Image.configure({
@@ -85,6 +87,7 @@ const createExtensions = (placeholder: string) => [
       )
     },
     onImageRemoved({ id, src }) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       console.log('Image removed', { id, src })
     },
     onValidationError(errors) {
@@ -123,21 +126,25 @@ const createExtensions = (placeholder: string) => [
     allowedMimeTypes: ['image/*'],
     maxFileSize: 5 * 1024 * 1024,
     onDrop: (editor, files, pos) => {
-      files.forEach(async file => {
-        const src = await fileToBase64(file)
-        editor.commands.insertContentAt(pos, {
-          type: 'image',
-          attrs: { src }
-        })
+      files.forEach(file => {
+        void (async () => {
+          const src = await fileToBase64(file)
+          editor.commands.insertContentAt(pos, {
+            type: 'image',
+            attrs: { src }
+          })
+        })()
       })
     },
     onPaste: (editor, files) => {
-      files.forEach(async file => {
-        const src = await fileToBase64(file)
-        editor.commands.insertContent({
-          type: 'image',
+      files.forEach(file => {
+        void (async () => {
+          const src = await fileToBase64(file)
+          editor.commands.insertContent({
+            type: 'image',
           attrs: { src }
-        })
+          })
+        })()
       })
     },
     onValidationError: errors => {
@@ -173,7 +180,7 @@ export const useMinimalTiptapEditor = ({
   const throttledSetValue = useThrottle((value: Content) => onUpdate?.(value), throttleDelay)
 
   const handleUpdate = React.useCallback(
-    (editor: Editor) => throttledSetValue(getOutput(editor, output)),
+    (editor: Editor) => { throttledSetValue(getOutput(editor, output)); },
     [output, throttledSetValue]
   )
 
@@ -198,8 +205,8 @@ export const useMinimalTiptapEditor = ({
         class: cn('focus:outline-none', editorClassName)
       }
     },
-    onUpdate: ({ editor }) => handleUpdate(editor),
-    onCreate: ({ editor }) => handleCreate(editor),
+    onUpdate: ({ editor }) => { handleUpdate(editor); },
+    onCreate: ({ editor }) => { handleCreate(editor); },
     onBlur: ({ editor }) => handleBlur(editor),
     ...props
   })

@@ -26,6 +26,7 @@ export const Link = TiptapLink.extend({
 
   addOptions() {
     return {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       ...this.parent?.(),
       openOnClick: false,
       HTMLAttributes: {
@@ -48,7 +49,7 @@ export const Link = TiptapLink.extend({
              * Handles the 'Escape' key press when there's a selection within the link.
              * This will move the cursor to the end of the link.
              */
-            if (event.key === 'Escape' && selection.empty !== true) {
+            if (event.key === 'Escape' && !selection.empty) {
               editor.commands.focus(selection.to, { scrollIntoView: false })
             }
 

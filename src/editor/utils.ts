@@ -21,7 +21,7 @@ type FileInput = File | { src: string | File; alt?: string; title?: string }
 
 export const isClient = (): boolean => typeof window !== 'undefined'
 export const isServer = (): boolean => !isClient()
-export const isMacOS = (): boolean => isClient() && window.navigator.platform === 'MacIntel'
+export const isMacOS = (): boolean => isClient() && /Mac|iPhone|iPad|iPod/.test(window.navigator.userAgent)
 
 const shortcutKeyMap: Record<string, ShortcutKeyResult> = {
   mod: isMacOS() ? { symbol: '⌘', readable: 'Command' } : { symbol: 'Ctrl', readable: 'Control' },
@@ -30,7 +30,7 @@ const shortcutKeyMap: Record<string, ShortcutKeyResult> = {
 }
 
 export const getShortcutKey = (key: string): ShortcutKeyResult =>
-  shortcutKeyMap[key.toLowerCase()] || { symbol: key, readable: key }
+  shortcutKeyMap[key.toLowerCase()] ?? { symbol: key, readable: key }
 
 export const getShortcutKeys = (keys: string[]): ShortcutKeyResult[] => keys.map(getShortcutKey)
 
