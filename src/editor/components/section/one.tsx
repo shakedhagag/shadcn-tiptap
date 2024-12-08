@@ -6,12 +6,21 @@ import type { VariantProps } from 'class-variance-authority'
 import type { toggleVariants } from '@/components/ui/toggle'
 import { cn } from '@/lib/utils'
 import { CaretDownIcon, LetterCaseCapitalizeIcon } from '@radix-ui/react-icons'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
 import { ToolbarButton } from '../toolbar-button'
 import { ShortcutKey } from '../shortcut-key'
 
-interface TextStyle extends Omit<FormatAction, 'value' | 'icon' | 'action' | 'isActive' | 'canExecute'> {
-  element: keyof JSX.IntrinsicElements
+interface TextStyle
+  extends Omit<
+    FormatAction,
+    'value' | 'icon' | 'action' | 'isActive' | 'canExecute'
+  > {
+  element: keyof React.JSX.IntrinsicElements
   level?: Level
   className: string
 }
@@ -75,7 +84,10 @@ interface SectionOneProps extends VariantProps<typeof toggleVariants> {
 export const SectionOne: React.FC<SectionOneProps> = React.memo(
   ({ editor, activeLevels = [1, 2, 3, 4, 5, 6], size, variant }) => {
     const filteredActions = React.useMemo(
-      () => formatActions.filter(action => !action.level || activeLevels.includes(action.level)),
+      () =>
+        formatActions.filter(
+          (action) => !action.level || activeLevels.includes(action.level)
+        ),
       [activeLevels]
     )
 
@@ -94,9 +106,13 @@ export const SectionOne: React.FC<SectionOneProps> = React.memo(
       ({ label, element: Element, level, className, shortcuts }: TextStyle) => (
         <DropdownMenuItem
           key={label}
-          onClick={() => handleStyleChange(level)}
-          className={cn('flex flex-row items-center justify-between gap-4', {
-            'bg-accent': level ? editor.isActive('heading', { level }) : editor.isActive('paragraph')
+          onClick={() => {
+            handleStyleChange(level)
+          }}
+          className={cn('flex flex-row items-center justify-between gap-4 ', {
+            'bg-accent': level
+              ? editor.isActive('heading', { level })
+              : editor.isActive('paragraph')
           })}
           aria-label={label}
         >
@@ -124,7 +140,7 @@ export const SectionOne: React.FC<SectionOneProps> = React.memo(
             <CaretDownIcon className="size-5" />
           </ToolbarButton>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-full">
+        <DropdownMenuContent align="start" className="w-full bg-background">
           {filteredActions.map(renderMenuItem)}
         </DropdownMenuContent>
       </DropdownMenu>

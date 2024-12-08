@@ -37,9 +37,16 @@ const ImageEditDialog = ({ editor, size, variant }: ImageEditDialogProps) => {
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Select image</DialogTitle>
-          <DialogDescription className="sr-only">Upload an image from your computer</DialogDescription>
+          <DialogDescription className="sr-only">
+            Upload an image from your computer
+          </DialogDescription>
         </DialogHeader>
-        <ImageEditBlock editor={editor} close={() => setOpen(false)} />
+        <ImageEditBlock
+          editor={editor}
+          close={() => {
+            setOpen(false)
+          }}
+        />
       </DialogContent>
     </Dialog>
   )

@@ -7,6 +7,7 @@ import { Typography } from '@tiptap/extension-typography'
 import { Placeholder } from '@tiptap/extension-placeholder'
 import { Underline } from '@tiptap/extension-underline'
 import { TextStyle } from '@tiptap/extension-text-style'
+import { Highlight } from '@tiptap/extension-highlight'
 import {
   Link,
   Image,
@@ -49,6 +50,9 @@ const createExtensions = (placeholder: string) => [
   GlobalDragHandleExtension,
   Link,
   Underline,
+  Highlight.configure({
+    multicolor: true
+  }),
   Image.configure({
     allowedMimeTypes: ['image/*'],
     maxFileSize: 5 * 1024 * 1024,
@@ -164,7 +168,15 @@ const createExtensions = (placeholder: string) => [
   HorizontalRule,
   ResetMarksOnEnter,
   CodeBlockLowlight,
-  Placeholder.configure({ placeholder: () => placeholder })
+  Placeholder.configure({
+    placeholder: ({ node }) => {
+      if (node.type.name === 'heading') {
+        return `Heading ${String(node.attrs.level)}`
+      }
+      return "Press '/' for commands";
+    },
+    includeChildren: true
+  })
 ]
 
 export const useMinimalTiptapEditor = ({

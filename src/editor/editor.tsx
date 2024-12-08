@@ -1,6 +1,7 @@
 import * as React from 'react'
 import './styles/index.css'
 import './styles/prosemirror.css'
+import '../index.css'
 
 import type { Content, Editor } from '@tiptap/react'
 import type { UseMinimalTiptapEditorProps } from './hooks/use-minimal-tiptap'
@@ -25,7 +26,7 @@ export interface MinimalTiptapProps
 }
 
 const Toolbar = ({ editor }: { editor: Editor }) => (
-  <div className="shrink-0 overflow-x-auto rounded-t-xl border border-border p-2">
+  <div className="shrink-0 overflow-x-auto rounded-t-xl border-border p-2 shadow-sm">
     <div className="flex w-max items-center gap-px">
       <SectionOne editor={editor} activeLevels={[1, 2, 3, 4, 5, 6]} />
 

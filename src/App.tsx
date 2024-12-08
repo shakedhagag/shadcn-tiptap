@@ -15,7 +15,7 @@ function App() {
             className="w-full"
             editorContentClassName="p-5"
             output="html"
-            placeholder="Type your description here..."
+            placeholder=""
             autofocus={true}
             editable={true}
             editorClassName="focus:outline-none"
