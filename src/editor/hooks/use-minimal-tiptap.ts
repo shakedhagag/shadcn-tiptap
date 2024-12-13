@@ -8,6 +8,7 @@ import { Placeholder } from '@tiptap/extension-placeholder'
 import { Underline } from '@tiptap/extension-underline'
 import { TextStyle } from '@tiptap/extension-text-style'
 import { Highlight } from '@tiptap/extension-highlight'
+import { Youtube } from '@tiptap/extension-youtube'
 import {
   Link,
   Image,
@@ -18,7 +19,8 @@ import {
   UnsetAllMarks,
   ResetMarksOnEnter,
   FileHandler,
-  GlobalDragHandleExtension
+  GlobalDragHandleExtension,
+  CustomKeymap
 } from '../extensions'
 import { cn } from '@/lib/utils'
 import { fileToBase64, getOutput, randomId } from '../utils'
@@ -35,7 +37,7 @@ export interface UseMinimalTiptapEditorProps extends UseEditorOptions {
   onBlur?: (content: Content) => void
 }
 
-const createExtensions = (placeholder: string) => [
+export const createExtensions = (placeholder: string) => [
   StarterKit.configure({
     horizontalRule: false,
     codeBlock: false,
@@ -47,6 +49,9 @@ const createExtensions = (placeholder: string) => [
     code: { HTMLAttributes: { class: 'inline', spellcheck: 'false' } },
     dropcursor: { width: 2, class: 'ProseMirror-dropcursor border' }
   }),
+  Youtube.configure({
+    HTMLAttributes: { class: 'rounded-lg border border-muted' }
+  }),
   GlobalDragHandleExtension,
   Link,
   Underline,
@@ -57,12 +62,12 @@ const createExtensions = (placeholder: string) => [
     allowedMimeTypes: ['image/*'],
     maxFileSize: 5 * 1024 * 1024,
     allowBase64: true,
-    uploadFn: async file => {
+    uploadFn: async (file) => {
       // NOTE: This is a fake upload function. Replace this with your own upload logic.
       // This function should return the uploaded image URL.
 
       // wait 3s to simulate upload
-      await new Promise(resolve => setTimeout(resolve, 3000))
+      await new Promise((resolve) => setTimeout(resolve, 3000))
 
       const src = await fileToBase64(file)
 
@@ -73,7 +78,7 @@ const createExtensions = (placeholder: string) => [
     onToggle(editor, files, pos) {
       editor.commands.insertContentAt(
         pos,
-        files.map(image => {
+        files.map((image) => {
           const blobUrl = URL.createObjectURL(image)
           const id = randomId()
 
@@ -95,7 +100,7 @@ const createExtensions = (placeholder: string) => [
       console.log('Image removed', { id, src })
     },
     onValidationError(errors) {
-      errors.forEach(error => {
+      errors.forEach((error) => {
         toast.error('Image validation error', {
           position: 'bottom-right',
           description: error.reason
@@ -130,7 +135,7 @@ const createExtensions = (placeholder: string) => [
     allowedMimeTypes: ['image/*'],
     maxFileSize: 5 * 1024 * 1024,
     onDrop: (editor, files, pos) => {
-      files.forEach(file => {
+      files.forEach((file) => {
         void (async () => {
           const src = await fileToBase64(file)
           editor.commands.insertContentAt(pos, {
@@ -141,18 +146,18 @@ const createExtensions = (placeholder: string) => [
       })
     },
     onPaste: (editor, files) => {
-      files.forEach(file => {
+      files.forEach((file) => {
         void (async () => {
           const src = await fileToBase64(file)
           editor.commands.insertContent({
             type: 'image',
-          attrs: { src }
+            attrs: { src }
           })
         })()
       })
     },
-    onValidationError: errors => {
-      errors.forEach(error => {
+    onValidationError: (errors) => {
+      errors.forEach((error) => {
         toast.error('Image validation error', {
           position: 'bottom-right',
           description: error.reason
@@ -168,12 +173,13 @@ const createExtensions = (placeholder: string) => [
   HorizontalRule,
   ResetMarksOnEnter,
   CodeBlockLowlight,
+  CustomKeymap,
   Placeholder.configure({
     placeholder: ({ node }) => {
       if (node.type.name === 'heading') {
         return `Heading ${String(node.attrs.level)}`
       }
-      return "Press '/' for commands";
+      return placeholder
     },
     includeChildren: true
   })
@@ -189,10 +195,15 @@ export const useMinimalTiptapEditor = ({
   onBlur,
   ...props
 }: UseMinimalTiptapEditorProps) => {
-  const throttledSetValue = useThrottle((value: Content) => onUpdate?.(value), throttleDelay)
+  const throttledSetValue = useThrottle(
+    (value: Content) => onUpdate?.(value),
+    throttleDelay
+  )
 
   const handleUpdate = React.useCallback(
-    (editor: Editor) => { throttledSetValue(getOutput(editor, output)); },
+    (editor: Editor) => {
+      throttledSetValue(getOutput(editor, output))
+    },
     [output, throttledSetValue]
   )
 
@@ -205,7 +216,10 @@ export const useMinimalTiptapEditor = ({
     [value]
   )
 
-  const handleBlur = React.useCallback((editor: Editor) => onBlur?.(getOutput(editor, output)), [output, onBlur])
+  const handleBlur = React.useCallback(
+    (editor: Editor) => onBlur?.(getOutput(editor, output)),
+    [output, onBlur]
+  )
 
   const editor = useEditor({
     extensions: createExtensions(placeholder),
@@ -217,8 +231,12 @@ export const useMinimalTiptapEditor = ({
         class: cn('focus:outline-none', editorClassName)
       }
     },
-    onUpdate: ({ editor }) => { handleUpdate(editor); },
-    onCreate: ({ editor }) => { handleCreate(editor); },
+    onUpdate: ({ editor }) => {
+      handleUpdate(editor)
+    },
+    onCreate: ({ editor }) => {
+      handleCreate(editor)
+    },
     onBlur: ({ editor }) => handleBlur(editor),
     ...props
   })
